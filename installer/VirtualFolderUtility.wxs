@@ -1,0 +1,93 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+    Id="*"
+    Name="Virtual Folder Utility"
+    Language="1033"
+    Version="1.0.0"
+    Manufacturer="SM21-blip"
+    UpgradeCode="90F451C2-0610-4E10-AAB1-2A09F31CB449">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perUser" Platform="x64" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Icon Id="VirtualFolderUtilityIcon" SourceFile="$(var.IconPath)" />
+    <Property Id="ARPPRODUCTICON" Value="VirtualFolderUtilityIcon" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="INSTALLFOLDER" Name="VirtualFolderUtility" />
+      </Directory>
+      <Directory Id="DesktopFolder" />
+    </Directory>
+
+    <Feature Id="ProductFeature" Title="Virtual Folder Utility" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+  </Product>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="MainFiles" Guid="CBE2D88D-AF2C-4B28-BB4E-F58321D3FE81">
+        <File Id="UtilityReadme" Source="$(var.PayloadDir)\README.md" />
+        <File Id="UtilityLauncher" Source="$(var.PayloadDir)\Run Virtual Folder Utility.bat" />
+        <File Id="UtilityApplet" Source="$(var.PayloadDir)\VirtualFolderApplet.cpl" />
+        <RegistryValue
+          Root="HKCU"
+          Key="Software\SM21-blip\VirtualFolderUtility"
+          Name="Payload"
+          Type="integer"
+          Value="1"
+          KeyPath="yes" />
+        <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
+      </Component>
+
+      <Directory Id="SourceFolder" Name="Source">
+        <Component Id="SourceFiles" Guid="F890E18D-4D03-400F-9327-D480AC195484">
+          <File Id="CplEntryPointSource" Source="$(var.PayloadDir)\Source\CplEntryPoint.cs" />
+          <File Id="NativeMethodsSource" Source="$(var.PayloadDir)\Source\NativeMethods.cs" />
+          <File Id="UtilityWindowSource" Source="$(var.PayloadDir)\Source\UtilityWindow.cs" />
+          <File Id="AppletProjectFile" Source="$(var.PayloadDir)\Source\VirtualFolderApplet.csproj" />
+          <RegistryValue
+            Root="HKCU"
+            Key="Software\SM21-blip\VirtualFolderUtility"
+            Name="Source"
+            Type="integer"
+            Value="1"
+            KeyPath="yes" />
+          <RemoveFolder Id="RemoveSourceFolder" On="uninstall" />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="00B130EC-0AB2-4186-91F8-8BF936FCE219">
+        <Shortcut
+          Id="VirtualFolderUtilityDesktopShortcut"
+          Name="Virtual Folder Utility"
+          Description="Launch Virtual Folder Utility"
+          WorkingDirectory="INSTALLFOLDER"
+          Icon="VirtualFolderUtilityIcon"
+          IconIndex="0"
+          Advertise="no"
+          Target="[SystemFolder]rundll32.exe"
+          Arguments="&quot;[INSTALLFOLDER]VirtualFolderApplet.cpl&quot;,RunUtility" />
+        <RegistryValue
+          Root="HKCU"
+          Key="Software\SM21-blip\VirtualFolderUtility"
+          Name="Installed"
+          Type="integer"
+          Value="1"
+          KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="AppFiles">
+      <ComponentRef Id="MainFiles" />
+      <ComponentRef Id="SourceFiles" />
+    </ComponentGroup>
+  </Fragment>
+</Wix>
