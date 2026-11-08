@@ -3,7 +3,7 @@
     Id="*"
     Name="Virtual Folder Utility"
     Language="1033"
-    Version="1.0.0"
+    Version="1.1.0"
     Manufacturer="SM21-blip"
     UpgradeCode="90F451C2-0610-4E10-AAB1-2A09F31CB449">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perUser" Platform="x64" />
