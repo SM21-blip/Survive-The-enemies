@@ -2,6 +2,9 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $archivePath = Join-Path $repoRoot 'VirtualFolderUtility.zip'
+$sourceDirectory = Join-Path $repoRoot 'VirtualFolderUtility\Source'
+$sourceProject = Join-Path $sourceDirectory 'VirtualFolderApplet.csproj'
+$publishDirectory = Join-Path $sourceDirectory 'bin\Release\net10.0-windows\win-x64\publish'
 $iconPath = Join-Path $PSScriptRoot 'VirtualFolderUtility.ico'
 $outputDirectory = Join-Path $PSScriptRoot 'bin'
 $outputPath = Join-Path $outputDirectory 'VirtualFolderUtility.msi'
@@ -42,6 +45,16 @@ try {
         }
     }
 
+    & dotnet publish $sourceProject -c Release -r win-x64 --self-contained true
+    if ($LASTEXITCODE -ne 0) {
+        throw "The utility applet build failed (exit code $LASTEXITCODE)."
+    }
+
+    $builtApplet = Join-Path $publishDirectory 'VirtualFolderApplet.cpl'
+    if (-not (Test-Path -LiteralPath $builtApplet -PathType Leaf)) {
+        throw "The freshly built Control Panel applet was not found: $builtApplet"
+    }
+
     Expand-Archive -LiteralPath $archivePath -DestinationPath $stageDirectory
     $payloadDirectory = Join-Path $stageDirectory 'VirtualFolderUtility'
     $expectedFiles = @(
@@ -57,6 +70,16 @@ try {
         if (-not (Test-Path -LiteralPath (Join-Path $payloadDirectory $file) -PathType Leaf)) {
             throw "The utility archive is missing $file."
         }
+    }
+
+    Copy-Item -LiteralPath $builtApplet -Destination (Join-Path $payloadDirectory 'VirtualFolderApplet.cpl') -Force
+    foreach ($sourceFile in @(
+        'CplEntryPoint.cs',
+        'NativeMethods.cs',
+        'UtilityWindow.cs',
+        'VirtualFolderApplet.csproj'
+    )) {
+        Copy-Item -LiteralPath (Join-Path $sourceDirectory $sourceFile) -Destination (Join-Path $payloadDirectory "Source\$sourceFile") -Force
     }
 
     New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null

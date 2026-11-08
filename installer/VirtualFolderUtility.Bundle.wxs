@@ -1,7 +1,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Bundle
     Name="Virtual Folder Utility"
-    Version="1.1.0.0"
+    Version="1.2.0.0"
     Manufacturer="SM21-blip"
     UpgradeCode="464C5D49-75C4-42E8-A312-8DF585F16EBB"
     IconSourceFile="$(var.IconPath)">

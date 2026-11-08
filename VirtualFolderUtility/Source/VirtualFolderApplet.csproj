@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>VirtualFolderApplet</AssemblyName>
+    <RootNamespace>VirtualFolderApplet</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishAot>true</PublishAot>
+    <NativeLib>Shared</NativeLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <Target Name="CopyControlPanelApplet" AfterTargets="Publish">
+    <Copy SourceFiles="$(PublishDir)$(AssemblyName).dll"
+          DestinationFiles="$(PublishDir)$(AssemblyName).cpl" />
+  </Target>
+</Project>
